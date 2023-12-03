@@ -4,22 +4,32 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.dicoding.todoapp.R
+import com.dicoding.todoapp.data.Task
+import com.dicoding.todoapp.ui.ViewModelFactory
 import com.dicoding.todoapp.utils.DatePickerFragment
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener {
     private var dueDateMillis: Long = System.currentTimeMillis()
+    private lateinit var addTaskViewModel: AddTaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
-        supportActionBar?.title = getString(R.string.add_task)
+        addTaskViewModel = ViewModelProvider(
+            this, ViewModelFactory.getInstance(applicationContext)
+        )[AddTaskViewModel::class.java]
 
+
+        supportActionBar?.title = getString(R.string.add_task)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -30,9 +40,19 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save -> {
+
                 //TODO 12 : Create AddTaskViewModel and insert new task to database
+
+                val titleEditText: EditText = findViewById(R.id.add_ed_title)
+                val descriptionEditText: EditText = findViewById(R.id.add_ed_description)
+                val title = titleEditText.text.toString()
+                val description = descriptionEditText.text.toString()
+                val newTask = Task(0, title, description, dueDateMillis)
+                addTaskViewModel.insertTask(newTask)
+                finish()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
