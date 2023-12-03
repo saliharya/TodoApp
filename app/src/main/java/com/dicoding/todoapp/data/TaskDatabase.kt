@@ -4,16 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.dicoding.todoapp.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.concurrent.Executors
 
 //TODO 3 : Define room database class and prepopulate database using JSON
 @Database(entities = [Task::class], version = 1)
@@ -29,15 +28,21 @@ abstract class TaskDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext, TaskDatabase::class.java, "task.db"
-                ).build()
+                ).addCallback(object : Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        INSTANCE?.let { database ->
+                            Executors.newSingleThreadExecutor().execute {
+                                fillWithStartingData(context, database.taskDao())
+                            }
+                        }
+                    }
+                }).build()
                 INSTANCE = instance
-                val dao = getInstance(context).taskDao()
-                CoroutineScope(Dispatchers.IO).launch {
-                    fillWithStartingData(context, dao)
-                }
                 instance
             }
         }
+
 
         private fun fillWithStartingData(context: Context, dao: TaskDao) {
             val task = loadJsonArray(context)
