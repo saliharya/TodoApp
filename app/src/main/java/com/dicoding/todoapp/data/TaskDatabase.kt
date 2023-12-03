@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.dicoding.todoapp.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -27,42 +29,41 @@ abstract class TaskDatabase : RoomDatabase() {
         fun getInstance(context: Context): TaskDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    TaskDatabase::class.java,
-                    "task.db"
-                ).addCallback(object : Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        INSTANCE?.let { database ->
-                            fillWithStartingData(context, database.taskDao())
-                        }
-                    }
-                }).build()
+                    context.applicationContext, TaskDatabase::class.java, "task.db"
+                ).createFromAsset("schemas/com.dicoding.todoapp.data.TaskDatabase/tasks.json")
+                    .build()
                 INSTANCE = instance
+                instance.taskDao().also { dao ->
+                    fillWithStartingData(context, dao)
+                }
                 instance
             }
         }
 
         private fun fillWithStartingData(context: Context, dao: TaskDao) {
-            val task = loadJsonArray(context)
-            try {
-                if (task != null) {
-                    for (i in 0 until task.length()) {
-                        val item = task.getJSONObject(i)
-                        dao.insertAll(
-                            Task(
-                                item.getInt("id"),
-                                item.getString("title"),
-                                item.getString("description"),
-                                item.getLong("dueDate"),
-                                item.getBoolean("completed")
+            CoroutineScope(Dispatchers.IO).launch {
+                val task = loadJsonArray(context)
+                try {
+                    if (task != null) {
+                        for (i in 0 until task.length()) {
+                            val item = task.getJSONObject(i)
+                            dao.insertAll(
+                                Task(
+                                    item.getInt("id"),
+                                    item.getString("title"),
+                                    item.getString("description"),
+                                    item.getLong("dueDate"),
+                                    item.getBoolean("completed")
+                                )
                             )
-                        )
+                        }
                     }
+                } catch (exception: JSONException) {
+                    exception.printStackTrace()
                 }
-            } catch (exception: JSONException) {
-                exception.printStackTrace()
             }
         }
+
 
         private fun loadJsonArray(context: Context): JSONArray? {
             val builder = StringBuilder()
@@ -82,5 +83,6 @@ abstract class TaskDatabase : RoomDatabase() {
             }
             return null
         }
+
     }
 }
