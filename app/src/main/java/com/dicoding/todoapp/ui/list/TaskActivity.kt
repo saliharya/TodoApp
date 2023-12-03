@@ -27,13 +27,14 @@ class TaskActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskViewModel: TaskViewModel
+    private lateinit var adapter: TaskAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task)
         setSupportActionBar(findViewById(R.id.toolbar))
 
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
+        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
             val addIntent = Intent(this, AddTaskActivity::class.java)
             startActivity(addIntent)
         }
@@ -41,6 +42,11 @@ class TaskActivity : AppCompatActivity() {
         //TODO 6 : Initiate RecyclerView with LayoutManager
         recyclerView = findViewById(R.id.rv_task)
         recyclerView.layoutManager = LinearLayoutManager(this)
+
+        adapter = TaskAdapter { task, isChecked ->
+            taskViewModel.completeTask(task, isChecked)
+        }
+        recyclerView.adapter = adapter
 
         initAction()
 
@@ -54,19 +60,13 @@ class TaskActivity : AppCompatActivity() {
 
     private fun showRecyclerView(tasks: PagedList<Task>) {
         //TODO 7 : Submit pagedList to adapter and update database when onCheckChange
-        val adapter = TaskAdapter { task, isChecked ->
-            taskViewModel.completeTask(task, isChecked)
-        }
-        recyclerView.adapter = adapter
         adapter.submitList(tasks)
     }
 
     private fun showSnackBar(eventMessage: Event<Int>) {
         val message = eventMessage.getContentIfNotHandled() ?: return
         Snackbar.make(
-            findViewById(R.id.coordinator_layout),
-            getString(message),
-            Snackbar.LENGTH_SHORT
+            findViewById(R.id.coordinator_layout), getString(message), Snackbar.LENGTH_SHORT
         ).show()
     }
 
@@ -114,8 +114,7 @@ class TaskActivity : AppCompatActivity() {
     private fun initAction() {
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
             override fun getMovementFlags(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
+                recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder
             ): Int {
                 return makeMovementFlags(0, ItemTouchHelper.RIGHT)
             }
