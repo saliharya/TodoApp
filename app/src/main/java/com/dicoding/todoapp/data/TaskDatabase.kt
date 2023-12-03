@@ -18,7 +18,6 @@ import java.io.InputStreamReader
 //TODO 3 : Define room database class and prepopulate database using JSON
 @Database(entities = [Task::class], version = 1)
 abstract class TaskDatabase : RoomDatabase() {
-
     abstract fun taskDao(): TaskDao
 
     companion object {
@@ -30,10 +29,10 @@ abstract class TaskDatabase : RoomDatabase() {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext, TaskDatabase::class.java, "task.db"
-                ).createFromAsset("schemas/com.dicoding.todoapp.data.TaskDatabase/tasks.json")
-                    .build()
+                ).build()
                 INSTANCE = instance
-                instance.taskDao().also { dao ->
+                val dao = getInstance(context).taskDao()
+                CoroutineScope(Dispatchers.IO).launch {
                     fillWithStartingData(context, dao)
                 }
                 instance
@@ -41,29 +40,26 @@ abstract class TaskDatabase : RoomDatabase() {
         }
 
         private fun fillWithStartingData(context: Context, dao: TaskDao) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val task = loadJsonArray(context)
-                try {
-                    if (task != null) {
-                        for (i in 0 until task.length()) {
-                            val item = task.getJSONObject(i)
-                            dao.insertAll(
-                                Task(
-                                    item.getInt("id"),
-                                    item.getString("title"),
-                                    item.getString("description"),
-                                    item.getLong("dueDate"),
-                                    item.getBoolean("completed")
-                                )
+            val task = loadJsonArray(context)
+            try {
+                if (task != null) {
+                    for (i in 0 until task.length()) {
+                        val item = task.getJSONObject(i)
+                        dao.insertAll(
+                            Task(
+                                item.getInt("id"),
+                                item.getString("title"),
+                                item.getString("description"),
+                                item.getLong("dueDate"),
+                                item.getBoolean("completed")
                             )
-                        }
+                        )
                     }
-                } catch (exception: JSONException) {
-                    exception.printStackTrace()
                 }
+            } catch (exception: JSONException) {
+                exception.printStackTrace()
             }
         }
-
 
         private fun loadJsonArray(context: Context): JSONArray? {
             val builder = StringBuilder()
