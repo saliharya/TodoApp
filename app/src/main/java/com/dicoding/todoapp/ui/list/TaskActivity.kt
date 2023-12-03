@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.todoapp.R
 import com.dicoding.todoapp.data.Task
@@ -24,7 +25,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class TaskActivity : AppCompatActivity() {
 
-    private lateinit var recycler: RecyclerView
+    private lateinit var recyclerView: RecyclerView
     private lateinit var taskViewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,11 +39,13 @@ class TaskActivity : AppCompatActivity() {
         }
 
         //TODO 6 : Initiate RecyclerView with LayoutManager
+        recyclerView = findViewById(R.id.rv_task)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         initAction()
 
         val factory = ViewModelFactory.getInstance(this)
-        taskViewModel = ViewModelProvider(this, factory).get(TaskViewModel::class.java)
+        taskViewModel = ViewModelProvider(this, factory)[TaskViewModel::class.java]
 
         taskViewModel.tasks.observe(this, Observer(this::showRecyclerView))
 
@@ -74,10 +77,12 @@ class TaskActivity : AppCompatActivity() {
                 startActivity(settingIntent)
                 true
             }
+
             R.id.action_filter -> {
                 showFilteringPopUpMenu()
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -124,6 +129,6 @@ class TaskActivity : AppCompatActivity() {
             }
 
         })
-        itemTouchHelper.attachToRecyclerView(recycler)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 }
