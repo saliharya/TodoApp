@@ -30,7 +30,7 @@ abstract class TaskDatabase : RoomDatabase() {
                     context.applicationContext,
                     TaskDatabase::class.java,
                     "task.db"
-                ).addCallback(object : RoomDatabase.Callback() {
+                ).addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         INSTANCE?.let { database ->
                             fillWithStartingData(context, database.taskDao())
