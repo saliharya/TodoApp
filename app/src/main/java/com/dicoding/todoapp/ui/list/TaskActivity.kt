@@ -39,7 +39,7 @@ class TaskActivity : AppCompatActivity() {
         }
 
         //TODO 6 : Initiate RecyclerView with LayoutManager
-        recyclerView = findViewById(R.id.rv_task)
+        recyclerView = findViewById(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         initAction()
@@ -52,8 +52,13 @@ class TaskActivity : AppCompatActivity() {
         //TODO 15 : Fixing bug : snackBar not show when task completed
     }
 
-    private fun showRecyclerView(task: PagedList<Task>) {
+    private fun showRecyclerView(tasks: PagedList<Task>) {
         //TODO 7 : Submit pagedList to adapter and update database when onCheckChange
+        val adapter = TaskAdapter { task, isChecked ->
+            taskViewModel.completeTask(task, isChecked)
+        }
+        recyclerView.adapter = adapter
+        adapter.submitList(tasks)
     }
 
     private fun showSnackBar(eventMessage: Event<Int>) {
