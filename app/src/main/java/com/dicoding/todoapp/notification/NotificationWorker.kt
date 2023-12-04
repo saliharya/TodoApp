@@ -19,6 +19,7 @@ import com.dicoding.todoapp.utils.DateConverter
 import com.dicoding.todoapp.utils.NOTIFICATION_CHANNEL_ID
 import com.dicoding.todoapp.utils.TASK_ID
 
+
 class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
     private val channelName = inputData.getString(NOTIFICATION_CHANNEL_ID)
@@ -40,7 +41,6 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
     }
 
     override fun doWork(): Result {
-        //TODO 14 : If notification preference on, get nearest active task from repository and show notification with pending intent
         val taskRepository = TaskRepository.getInstance(applicationContext)
         val nearestTask = taskRepository.getNearestActiveTask()
         val notificationManager = NotificationManagerCompat.from(applicationContext)
@@ -56,6 +56,7 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 .setContentText(notificationContent).setSmallIcon(R.drawable.ic_notifications)
                 .setContentIntent(pendingIntent).setAutoCancel(true).build()
         }
+
         if (notification != null) {
             try {
                 if (notificationManager.areNotificationsEnabled()) {

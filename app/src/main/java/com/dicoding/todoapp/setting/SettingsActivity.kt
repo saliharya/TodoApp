@@ -74,10 +74,10 @@ class SettingsActivity : AppCompatActivity() {
             val channelName = getString(R.string.notify_channel_name)
 
             val workRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
-                24, TimeUnit.HOURS
+                1, TimeUnit.MILLISECONDS
             ).setInputData(workDataOf(NOTIFICATION_CHANNEL_ID to channelName)).build()
             WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-                "DailyReminder", ExistingPeriodicWorkPolicy.KEEP, workRequest
+                "DailyReminder", ExistingPeriodicWorkPolicy.UPDATE, workRequest
             )
         }
     }
