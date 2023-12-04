@@ -46,21 +46,21 @@ class DetailTaskActivity : AppCompatActivity() {
     }
 
     private fun updateUI(task: Task) {
-        val titleEditText: TextInputEditText = findViewById(R.id.detail_ed_title)
-        val descriptionEditText: TextInputEditText = findViewById(R.id.detail_ed_description)
-        val dueDateEditText: TextInputEditText = findViewById(R.id.detail_ed_due_date)
+        val titleEditText: TextInputEditText? = findViewById(R.id.detail_ed_title)
+        val descriptionEditText: TextInputEditText? = findViewById(R.id.detail_ed_description)
+        val dueDateEditText: TextInputEditText? = findViewById(R.id.detail_ed_due_date)
 
-        titleEditText.setText(task.title)
-        descriptionEditText.setText(task.description)
+        titleEditText?.setText(task.title)
+        descriptionEditText?.setText(task.description)
 
         val formattedDueDate = DateConverter.convertMillisToString(task.dueDateMillis)
-        dueDateEditText.setText(formattedDueDate)
+        dueDateEditText?.setText(formattedDueDate)
 
-        titleEditText.isFocusable = true
-        titleEditText.isClickable = true
-        descriptionEditText.isFocusable = true
-        descriptionEditText.isClickable = true
-        dueDateEditText.isFocusable = true
-        dueDateEditText.isClickable = true
+        titleEditText?.isFocusable = true
+        titleEditText?.isClickable = true
+        descriptionEditText?.isFocusable = true
+        descriptionEditText?.isClickable = true
+        dueDateEditText?.isFocusable = true
+        dueDateEditText?.isClickable = true
     }
 }
