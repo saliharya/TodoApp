@@ -22,8 +22,8 @@
         <activity android:name=".ui.add.AddTaskActivity" />
         <activity
             android:name=".ui.list.TaskActivity"
-            android:theme="@style/Theme.TodoApp.NoActionBar"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.TodoApp.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

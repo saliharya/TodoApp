@@ -33,10 +33,9 @@ class TaskRepository(private val tasksDao: TaskDao) {
     fun getTasks(filter: TasksFilterType): LiveData<PagedList<Task>> {
         val query = FilterUtils.getFilteredQuery(filter)
         val dataSourceFactory = tasksDao.getTasks(query)
-        val config = PagedList.Config.Builder()
-            .setPageSize(PAGE_SIZE)
-            .setEnablePlaceholders(PLACEHOLDERS)
-            .build()
+        val config =
+            PagedList.Config.Builder().setPageSize(PAGE_SIZE).setEnablePlaceholders(PLACEHOLDERS)
+                .build()
         return LivePagedListBuilder(dataSourceFactory, config).build()
     }
 
