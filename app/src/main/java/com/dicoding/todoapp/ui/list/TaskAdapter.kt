@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -34,29 +33,17 @@ class TaskAdapter(
             //TODO 10 : Display title based on status using TitleTextView
             task.isCompleted -> {
                 holder.cbComplete.isChecked = true
-                holder.tvTitle.setTextColor(
-                    ContextCompat.getColor(
-                        holder.itemView.context, R.color.pink_500
-                    )
-                )
+                holder.tvTitle.state = TaskTitleView.DONE
             }
 
             task.dueDateMillis < System.currentTimeMillis() -> {
                 holder.cbComplete.isChecked = false
-                holder.tvTitle.setTextColor(
-                    ContextCompat.getColor(
-                        holder.itemView.context, R.color.teal_700
-                    )
-                )
+                holder.tvTitle.state = TaskTitleView.OVERDUE
             }
 
             else -> {
                 holder.cbComplete.isChecked = false
-                holder.tvTitle.setTextColor(
-                    ContextCompat.getColor(
-                        holder.itemView.context, R.color.black
-                    )
-                )
+                holder.tvTitle.state = TaskTitleView.NORMAL
             }
         }
     }
