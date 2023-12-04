@@ -6,6 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.dicoding.todoapp.R
@@ -47,9 +48,14 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                 val descriptionEditText: EditText = findViewById(R.id.add_ed_description)
                 val title = titleEditText.text.toString()
                 val description = descriptionEditText.text.toString()
-                val newTask = Task(0, title, description, dueDateMillis)
-                addTaskViewModel.insertTask(newTask)
-                finish()
+                if (title.isBlank()) {
+                    Toast.makeText(this, getString(R.string.empty_task_message), Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    val newTask = Task(0, title, description, dueDateMillis)
+                    addTaskViewModel.insertTask(newTask)
+                    finish()
+                }
                 true
             }
 

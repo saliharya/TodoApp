@@ -15,6 +15,7 @@ import com.dicoding.todoapp.R
 import com.dicoding.todoapp.data.Task
 import com.dicoding.todoapp.data.TaskRepository
 import com.dicoding.todoapp.ui.detail.DetailTaskActivity
+import com.dicoding.todoapp.utils.DateConverter
 import com.dicoding.todoapp.utils.NOTIFICATION_CHANNEL_ID
 import com.dicoding.todoapp.utils.TASK_ID
 
@@ -44,9 +45,15 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         val nearestTask = taskRepository.getNearestActiveTask()
         val notificationManager = NotificationManagerCompat.from(applicationContext)
         val pendingIntent = getPendingIntent(nearestTask)
+
+        val formattedDueDate = DateConverter.convertMillisToString(nearestTask.dueDateMillis)
+
+        val notificationContent =
+            applicationContext.getString(R.string.notify_content, formattedDueDate)
+
         val notification = channelName?.let {
             NotificationCompat.Builder(applicationContext, it).setContentTitle(nearestTask.title)
-                .setContentText(nearestTask.description).setSmallIcon(R.drawable.ic_notifications)
+                .setContentText(notificationContent).setSmallIcon(R.drawable.ic_notifications)
                 .setContentIntent(pendingIntent).setAutoCancel(true).build()
         }
         if (notification != null) {
